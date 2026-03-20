@@ -1,5 +1,19 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
 from database import Base
+
+
+class Usuario(Base):
+
+    __tablename__ = "usuarios"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    senha = Column(String)
+
+    # relação com tarefas
+    tarefas = relationship("Tarefa", back_populates="usuario")
+
 
 class Tarefa(Base):
 
@@ -10,10 +24,8 @@ class Tarefa(Base):
     descricao = Column(String)
     concluida = Column(Boolean, default=False)
 
-class Usuario(Base):
+    # chave estrangeira (liga com Usuario)
+    usuario_id = Column(Integer, ForeignKey("usuarios.id"))
 
-    __tablename__ = "usuarios"
-
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    senha = Column(String)
+    # relação com usuario
+    usuario = relationship("Usuario", back_populates="tarefas")

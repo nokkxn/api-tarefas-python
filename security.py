@@ -1,31 +1,34 @@
 from passlib.context import CryptContext
+from jose import jwt
+from datetime import datetime, timedelta
 
+# 🔐 configuração do hash
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+# 🔑 segredo do token
+SECRET_KEY = "segredo_super_secreto"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-def hash_senha(senha: str):
+
+# 🔹 gerar hash da senha
+def gerar_hash_senha(senha: str):
     return pwd_context.hash(senha)
 
 
-def verificar_senha(senha, hash):
+# 🔹 verificar senha
+def verificar_senha(senha: str, hash: str):
     return pwd_context.verify(senha, hash)
 
-from jose import JWTError, jwt
-from datetime import datetime, timedelta
 
-SECRET_KEY = "segredo123"
-ALGORITHM = "HS256"
-EXPIRACAO_MINUTOS = 30
+# 🔹 criar token JWT
+def criar_token(data: dict):
+    to_encode = data.copy()
 
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
-def criar_token(dados: dict):
+    to_encode.update({"exp": expire})
 
-    dados_copia = dados.copy()
-
-    expiracao = datetime.utcnow() + timedelta(minutes=EXPIRACAO_MINUTOS)
-
-    dados_copia.update({"exp": expiracao})
-
-    token = jwt.encode(dados_copia, SECRET_KEY, algorithm=ALGORITHM)
+    token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
     return token
